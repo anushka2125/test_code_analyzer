@@ -23,5 +23,7 @@ def check_conditions(a,b):
         print("A is greater than B")  
     elif a == b:
        print("A is equal to B")
+    else:
+        print("B is lesser than A")
 
 print(myFunction(6, 3))   # unclosed comment here
