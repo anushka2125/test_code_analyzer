@@ -5,8 +5,10 @@ def myFunction(x,y):
 
   #function to calculate sum of squares.
   def calc_sum_squares(a,b, c):
-    sum_squares = (a**2 + b**2+c**2) # this line is too long, exceeds 79 characters.
-  return sum_squares  #  closing parenthesis error
+    strin =""
+    thin =""
+    a = b+c
+  return 0  #  closing parenthesis error
 
   total =  calc_sum_squares (4 ,3, 6)
     print(total) #  misaligned indentation 
@@ -21,7 +23,5 @@ def check_conditions(a,b):
         print("A is greater than B")  
     elif a == b:
        print("A is equal to B")
-    else:
-        print("B is greater than A")
 
 print(myFunction(6, 3))   # unclosed comment here
