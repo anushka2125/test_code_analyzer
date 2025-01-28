@@ -1,0 +1,45 @@
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.12.5
+
+executors:
+  python_env:
+    docker:
+      - image: artifactory.dyn.ntnxdpro.com/ntnx-general-docker/cimg/python:3.8.5
+    resource_class: medium
+    environment:
+      JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+      CANAVERAL_BUILD_SYSTEM: maven
+      CANAVERAL_PACKAGE_TOOLS: maven-jar
+      CANAVERAL_USE_LEGACY_PIPELINE_MODE: 0
+      CANAVERAL_USE_BLUEPRINT_PROXY: 1
+      CANAVERAL_MAVEN_VERISON: 3.6.1
+  run_auto_code_review:
+    steps:
+      - install_python_libraries:
+          pip_packages: requests json typing
+
+      - run:
+          name: Check for pull request existence
+          command: |
+            curl -L -H  "Accept: application/vnd.github+json" -H "Authorization: Bearer $CODE_COVERAGE_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls?head=$CIRCLE_PROJECT_USERNAME:$CIRCLE_BRANCH >> pr.json
+            if [ `jq length pr.json` -eq 0 ]; then
+              echo "No pull request found for branch $CIRCLE_BRANCH"
+            else
+              echo 'export PR_PRESENT="yes"' >> "$BASH_ENV"
+              echo 'export BASE_BRANCH="$(jq -r '.[0].base.ref' pr.json)"' >> "$BASH_ENV"
+              echo 'export PULL_NUMBER="$(jq -r '.[0].number' pr.json)"' >> "$BASH_ENV"
+              source "$BASH_ENV" 
+              echo 'Base branch:' $BASE_BRANCH
+              echo 'Pull request number:' $PULL_NUMBER
+            fi
+
+      - run:
+          name: Run script
+          command: |
+             if [[ -v PR_PRESENT ]]; then
+                python code-analyzer.py $PULL_NUMBER
+             else
+                echo "Skip running code analyzer"
+             fi
