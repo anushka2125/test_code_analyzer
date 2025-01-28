@@ -24,4 +24,4 @@ def check_conditions(a,b):
     else:
         print("B is greater than A")
 
-print(myFunction(5, 3))   # unclosed comment here
+print(myFunction(6, 3))   # unclosed comment here
